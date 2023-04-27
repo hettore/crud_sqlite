@@ -24,13 +24,13 @@ de todos os produtos cadastrados-->
             </thead>
             <tbody>
                 <!-- NO NOSSO PROJETO ORIGINAL, ESTE TEMPLATE RECEBIA UM DICIONÁRIO PARA PERCORRER. PRECISAMOS ALTERAR PARA QUE ELE RECEBA UMA LISTA DE TUPLAS -->
-                    {% for id, produto in produtos.items() %}
+                    {% for id, nome, descricao, preco, imagem in produtos %}
                     <tr>
                         <td> {{ id }} </td>
-                        <td> {{ produto['nome'] }} </td>
-                        <td> {{ produto['descricao'] }}</td>
-                        <td> {{ produto['preco'] }} </td>
-                        <td><img src="{{ url_for('static', filename='img/' + produto['imagem']) }}" alt="thumbnail" class="img-thumbnail"></td>
+                        <td> {{ nome }} </td>
+                        <td> {{ descricao }}</td>
+                        <td> {{ preco }} </td>
+                        <td><img src="{{ url_for('static', filename='img/' + imagem) }}" alt="thumbnail" class="img-thumbnail"></td>
                         <td><a href="{{ url_for('exibir_produto', id=id) }}">Editar</a></td>
                     </tr>
                     {% endfor %}

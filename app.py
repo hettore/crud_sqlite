@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 import repositorio
+import os
+
+caminho = f"{os.path.dirname(__file__)}\\db\\produtos.db"
 
 app = Flask(__name__)
 
@@ -17,12 +20,9 @@ def listagem_produtos():
 #Abrir um produto específico (carregando seus dados) no template cadastro.html
 @app.route("/produto/<int:id>", methods=["GET"])
 def exibir_produto(id):
-    if id == 0: #estamos verificando se o id recebido foi ZERO.
-        id = repositorio.gerar_id() #caso o id recebido tenha sido ZERO, vamos gerar um novo id, pois é sinal de que estão querendo criar um novo produto (essa combinação de que 0 = novo produto foi feita por nós)
-
-    produto = repositorio.retornar_produto(id)
-    produto['id'] = id
-    return render_template('cadastro.html', **produto)
+    
+    id, nome, descricao, preco, imagem = repositorio.retornar_produto(id)
+    return render_template('cadastro.html', id=id, nome=nome, descricao=descricao, preco=preco, imagem=imagem)
     
 
 #Abrir o template cadastro.html apenas com o id preenchido para permitir novo cadastro
@@ -45,10 +45,11 @@ def editar_produto(id):
         produto["imagem"] = request.form["imagem"]
 
         #preciso definir se vou SALVAR um novo produto ou ATUALIZAR um produto já existente
-        produtos = repositorio.retornar_produtos()
+        produto_existente = repositorio.retornar_produto(id)
         #vamos testar se o id do produto está no dicionário que contém todos eles.
-        if id in produtos.keys():
-            repositorio.atualizar_produto(id, produto) #caso o id já exista, vamos chamar a função atualizar_produto, indicando o id e os novos dados
+        if produto_existente[1]: # caso a tupla q voltou do banco de dados tenha dados na coluna 1, vamos atualizar o produto. Caso contrario, vamos criar um novo
+            produto["id"] = id
+            repositorio.atualizar_produto(**produto) #caso o id já exista, vamos chamar a função atualizar_produto, indicando o id e os novos dados
         else:
             repositorio.criar_produto(**produto) #caso a id não exista, vamos chamar a função criar_produto passando os dados do dicionário
             #repositorio.criar_produto(nome=produto['nome'], descricao=produto['descricao'], preco=produto['preco'], imagem=produto['imagem'])
